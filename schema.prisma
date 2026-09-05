@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model crop {
+  baseTemp      Float     @default(10)
+  bloomDate     DateTime? @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+  expectedYield Float?
+  farmId        Int
+  harvestDate   DateTime? @db.Timestamptz(6)
+  id            Int       @id @default(autoincrement())
+  name          String
+  plantingDate  DateTime? @db.Timestamptz(6)
+  status        String
+  targetGdd     Float     @default(1500)
+  farm          farm      @relation(fields: [farmId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  farmLog       farmLog[]
+
+  @@index([farmId], map: "crop_farmId_idx_786bd89b")
+}
+
+model farm {
+  actualArea Float
+  address    String
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  gridX      Int
+  gridY      Int
+  id         Int      @id @default(autoincrement())
+  name       String
+  totalArea  Float
+  crop       crop[]
+}
+
+model farmLog {
+  avgTemp   Float?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  cropId    Int
+  date      DateTime @db.Timestamptz(6)
+  id        Int      @id @default(autoincrement())
+  memo      String
+  stage     String
+  workType  String
+  crop      crop     @relation(fields: [cropId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([cropId], map: "farmLog_cropId_idx_879e8d63")
+}

@@ -328,7 +328,7 @@ const WORK_CATEGORIES = [
   {
     id: "growth",
     title: "🌿 2. 생육 관리 및 전지 (성장 단계)",
-    tasks: ["물주기(관수)","비료/영양제 살포","농약방제/병해충 관리","가식/이식", "보식/솎아내기(적묘)", "순지르기(적심)/곁순 제거", "적화(꽃솎기)/적과(열매솎기)", "유인"],
+    tasks: ["물주기(관수)", "비료/영양제 살포", "농약방제/병해충 관리", "가식/이식", "보식/솎아내기(적묘)", "순지르기(적심)/곁순 제거", "적화(꽃솎기)/적과(열매솎기)", "유인"],
   },
   {
     id: "facility",
@@ -380,7 +380,7 @@ export default function FarmingLog({ cropList }: FarmingLogProps) {
       harvestAmount: "",
       harvestUnit: "kg",
       content: "",
-      growthStage:""
+      growthStage: "",
     },
   ]);
 
@@ -448,7 +448,7 @@ export default function FarmingLog({ cropList }: FarmingLogProps) {
     alert(`🎯 ${workDate} 자로 총 ${logItems.length}건의 영농 기록이 저장되었습니다.`);
   };
 
-return (
+  return (
     <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-100 font-sans">
       <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-5">📝 영농 일지 일괄 작성</h2>
 
@@ -513,70 +513,68 @@ return (
                 ))}
               </div>
 
-            {/* 4. [조건부] 특정 키워드 감지 시 투입량/수확량 입력창 노출 (스르륵 늘어나는 애니메이션 적용) */}
-<div className="flex flex-col gap-1">
-  
-  {/* 비료 입력창 */}
-  {(() => {
-    const isVisible = item.selectedWorks?.some((w) => w.includes("비료"));
-    return (
-      <div className={`grid transition-all duration-300 ease-in-out ${isVisible ? "grid-rows-[1fr] opacity-100 mb-2" : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"}`}>
-        <div className="overflow-hidden">
-          <div className="flex gap-2 items-center bg-white p-3 rounded-lg border border-slate-300 shadow-inner">
-            <span className="text-xs font-bold text-slate-800 pl-1 w-24 shrink-0">🧪 밑거름/비료량:</span>
-            <input type="number" placeholder="예: 500" value={item.fertilizerAmount || ""} onChange={(e) => handleLogItemChange(item.id, "fertilizerAmount", e.target.value)} className="flex-1 p-1.5 text-sm font-bold border-b border-slate-300 text-slate-900 focus:outline-none focus:border-emerald-600" />
-            <select value={item.fertilizerUnit || "kg"} onChange={(e) => handleLogItemChange(item.id, "fertilizerUnit", e.target.value)} className="p-1.5 border border-slate-300 rounded text-xs bg-slate-50 text-slate-800 font-bold">
-              <option value="kg">kg (킬로그램)</option>
-              <option value="g">g (그램)</option>
-              <option value="포대">포대 (포)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    );
-  })()}
+              {/* 4. [조건부] 특정 키워드 감지 시 투입량/수확량 입력창 노출 (스르륵 늘어나는 애니메이션 적용) */}
+              <div className="flex flex-col gap-1">
+                {/* 비료 입력창 */}
+                {(() => {
+                  const isVisible = item.selectedWorks?.some((w) => w.includes("비료"));
+                  return (
+                    <div className={`grid transition-all duration-300 ease-in-out ${isVisible ? "grid-rows-[1fr] opacity-100 mb-2" : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"}`}>
+                      <div className="overflow-hidden">
+                        <div className="flex gap-2 items-center bg-white p-3 rounded-lg border border-slate-300 shadow-inner">
+                          <span className="text-xs font-bold text-slate-800 pl-1 w-24 shrink-0">🧪 밑거름/비료량:</span>
+                          <input type="number" placeholder="예: 500" value={item.fertilizerAmount || ""} onChange={(e) => handleLogItemChange(item.id, "fertilizerAmount", e.target.value)} className="flex-1 p-1.5 text-sm font-bold border-b border-slate-300 text-slate-900 focus:outline-none focus:border-emerald-600" />
+                          <select value={item.fertilizerUnit || "kg"} onChange={(e) => handleLogItemChange(item.id, "fertilizerUnit", e.target.value)} className="p-1.5 border border-slate-300 rounded text-xs bg-slate-50 text-slate-800 font-bold">
+                            <option value="kg">kg (킬로그램)</option>
+                            <option value="g">g (그램)</option>
+                            <option value="포대">포대 (포)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
-  {/* 농약 입력창 */}
-  {(() => {
-    const isVisible = item.selectedWorks?.some((w) => w.includes("농약"));
-    return (
-      <div className={`grid transition-all duration-300 ease-in-out ${isVisible ? "grid-rows-[1fr] opacity-100 mb-2" : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"}`}>
-        <div className="overflow-hidden">
-          <div className="flex gap-2 items-center bg-white p-3 rounded-lg border border-slate-300 shadow-inner">
-            <span className="text-xs font-bold text-slate-800 pl-1 w-24 shrink-0">🚜 농약 사용량:</span>
-            <input type="number" placeholder="예: 20" value={item.pesticideAmount || ""} onChange={(e) => handleLogItemChange(item.id, "pesticideAmount", e.target.value)} className="flex-1 p-1.5 text-sm font-bold border-b border-slate-300 text-slate-900 focus:outline-none focus:border-emerald-600" />
-            <select value={item.pesticideUnit || "ml"} onChange={(e) => handleLogItemChange(item.id, "pesticideUnit", e.target.value)} className="p-1.5 border border-slate-300 rounded text-xs bg-slate-50 text-slate-800 font-bold">
-              <option value="ml">ml (밀리리터)</option>
-              <option value="L">L (리터)</option>
-              <option value="g">g (그램)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    );
-  })()}
+                {/* 농약 입력창 */}
+                {(() => {
+                  const isVisible = item.selectedWorks?.some((w) => w.includes("농약"));
+                  return (
+                    <div className={`grid transition-all duration-300 ease-in-out ${isVisible ? "grid-rows-[1fr] opacity-100 mb-2" : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"}`}>
+                      <div className="overflow-hidden">
+                        <div className="flex gap-2 items-center bg-white p-3 rounded-lg border border-slate-300 shadow-inner">
+                          <span className="text-xs font-bold text-slate-800 pl-1 w-24 shrink-0">🚜 농약 사용량:</span>
+                          <input type="number" placeholder="예: 20" value={item.pesticideAmount || ""} onChange={(e) => handleLogItemChange(item.id, "pesticideAmount", e.target.value)} className="flex-1 p-1.5 text-sm font-bold border-b border-slate-300 text-slate-900 focus:outline-none focus:border-emerald-600" />
+                          <select value={item.pesticideUnit || "ml"} onChange={(e) => handleLogItemChange(item.id, "pesticideUnit", e.target.value)} className="p-1.5 border border-slate-300 rounded text-xs bg-slate-50 text-slate-800 font-bold">
+                            <option value="ml">ml (밀리리터)</option>
+                            <option value="L">L (리터)</option>
+                            <option value="g">g (그램)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
-  {/* 수확량 입력창 */}
-  {(() => {
-    const isVisible = item.selectedWorks?.some((w) => w.includes("수확"));
-    return (
-      <div className={`grid transition-all duration-300 ease-in-out ${isVisible ? "grid-rows-[1fr] opacity-100 mb-2" : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"}`}>
-        <div className="overflow-hidden">
-          <div className="flex gap-2 items-center bg-white p-3 rounded-lg border border-slate-300 shadow-inner">
-            <span className="text-xs font-bold text-slate-800 pl-1 w-24 shrink-0">📦 수확량 기록:</span>
-            <input type="number" placeholder="예: 15" value={item.harvestAmount || ""} onChange={(e) => handleLogItemChange(item.id, "harvestAmount", e.target.value)} className="flex-1 p-1.5 text-sm font-bold border-b border-slate-300 text-slate-900 focus:outline-none focus:border-emerald-600" />
-            <select value={item.harvestUnit || "kg"} onChange={(e) => handleLogItemChange(item.id, "harvestUnit", e.target.value)} className="p-1.5 border border-slate-300 rounded text-xs bg-slate-50 text-slate-800 font-bold">
-              <option value="kg">kg (킬로그램)</option>
-              <option value="g">g (그램)</option>
-              <option value="박스">박스</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    );
-  })()}
-
-</div>
+                {/* 수확량 입력창 */}
+                {(() => {
+                  const isVisible = item.selectedWorks?.some((w) => w.includes("수확"));
+                  return (
+                    <div className={`grid transition-all duration-300 ease-in-out ${isVisible ? "grid-rows-[1fr] opacity-100 mb-2" : "grid-rows-[0fr] opacity-0 mb-0 pointer-events-none"}`}>
+                      <div className="overflow-hidden">
+                        <div className="flex gap-2 items-center bg-white p-3 rounded-lg border border-slate-300 shadow-inner">
+                          <span className="text-xs font-bold text-slate-800 pl-1 w-24 shrink-0">📦 수확량 기록:</span>
+                          <input type="number" placeholder="예: 15" value={item.harvestAmount || ""} onChange={(e) => handleLogItemChange(item.id, "harvestAmount", e.target.value)} className="flex-1 p-1.5 text-sm font-bold border-b border-slate-300 text-slate-900 focus:outline-none focus:border-emerald-600" />
+                          <select value={item.harvestUnit || "kg"} onChange={(e) => handleLogItemChange(item.id, "harvestUnit", e.target.value)} className="p-1.5 border border-slate-300 rounded text-xs bg-slate-50 text-slate-800 font-bold">
+                            <option value="kg">kg (킬로그램)</option>
+                            <option value="g">g (그램)</option>
+                            <option value="박스">박스</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
 
               {/* ✍️ 상세 내용 입력란 */}
               <div>
@@ -601,8 +599,6 @@ return (
             </div>
           ))}
         </div>
-
-        
       </div>
 
       {/* 3. 전체 저장 버튼 */}
@@ -610,5 +606,5 @@ return (
         🎯 작성된 모든 일지 내역 저장하기
       </button>
     </div>
-);
+  );
 }

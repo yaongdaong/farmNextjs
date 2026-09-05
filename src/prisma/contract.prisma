@@ -1,0 +1,57 @@
+// 1. 농장 (장소/부지 정보)
+model Farm {
+  id          Int      @id @default(autoincrement())
+  name        String   // 예: "1번 비닐하우스"
+  address     String   // 도로명/지번 주소
+  gridX       Int      // 기상청 격자 X
+  gridY       Int      // 기상청 격자 Y
+  totalArea   Float    // 총 면적 (평)
+  actualArea  Float    // 실제 재배 면적 (평)
+  
+  crops       Crop[]   // 농장에서 재배되었거나 재배 중인 작물들
+  createdAt   DateTime @default(now())
+}
+
+// 2. 재배 작물 (식재 이력 및 적산온도 목표)
+model Crop {
+  id            Int       @id @default(autoincrement())
+  farmId        Int
+  farm          Farm      @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  
+  name          String    // 작물명 (예: "고추")
+  status        String    // "planned" | "growing" | "harvested"
+  
+  plantingDate  DateTime? // 식재일
+  bloomDate     DateTime? // 개화일
+  harvestDate   DateTime? // 수확(예정)일
+  
+  baseTemp      Float     @default(10.0)   // 생육 하한 온도의 기준점
+  targetGdd     Float     @default(1500.0) // 목표 적산온도
+  expectedYield Float?    // 예상 수확량
+
+  logs          FarmLog[] // 이 작물에 작성된 영농일지/기상로그
+  createdAt     DateTime  @default(now())
+}
+
+// 3. 영농일지 및 기상/적산온도 기록 (시간 흐름 데이터)
+model FarmLog {
+  id            Int      @id @default(autoincrement())
+  cropId        Int
+  crop          Crop     @relation(fields: [cropId], references: [id], onDelete: Cascade)
+  
+  date          DateTime @default(now()) // 기록 일자
+  workType      String?  // 작업 종류 ("관수", "시비", "소독", "기상자동기록" 등)
+  stage         String?  // 생육 단계 ("육묘기", "생육기", "수확기" 등)
+  memo          String?  // 영농 메모
+  
+  // Python에서 가져온 기상 및 당일 계산된 적산온도 (GDD)
+  avgTemp       Float?   // 일평균 기온
+  humidity      Int?     // 습도
+  rain          Float?   // 강수량
+  solHours      Float?   // 일조시간
+  effectiveTemp Float?   // 당일 산출된 유효 적산온도 (GDD)
+
+  createdAt     DateTime @default(now())
+
+  @@index([cropId, date])
+}

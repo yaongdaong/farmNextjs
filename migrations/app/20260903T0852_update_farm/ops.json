@@ -1,0 +1,355 @@
+[
+  {
+    "id": "dropTable.post",
+    "label": "Drop table \"post\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "post"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"post\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"post\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop table \"post\"",
+        "sql": "DROP TABLE \"public\".\"post\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"post\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"post\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropTable.user",
+    "label": "Drop table \"user\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"user\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop table \"user\"",
+        "sql": "DROP TABLE \"public\".\"user\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"user\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.crop",
+    "label": "Create table \"crop\"",
+    "summary": "Creates table \"crop\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "crop"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"crop\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"crop\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"crop\"",
+        "sql": "CREATE TABLE \"public\".\"crop\" (\n  \"baseTemp\" float8 DEFAULT 10 NOT NULL,\n  \"bloomDate\" timestamptz,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"expectedYield\" float8,\n  \"farmId\" int4 NOT NULL,\n  \"harvestDate\" timestamptz,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"plantingDate\" timestamptz,\n  \"status\" text NOT NULL,\n  \"targetGdd\" float8 DEFAULT 1500 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"crop\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"crop\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.farm",
+    "label": "Create table \"farm\"",
+    "summary": "Creates table \"farm\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "farm"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"farm\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"farm\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"farm\"",
+        "sql": "CREATE TABLE \"public\".\"farm\" (\n  \"actualArea\" float8 NOT NULL,\n  \"address\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"gridX\" int4 NOT NULL,\n  \"gridY\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"totalArea\" float8 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"farm\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"farm\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.farmLog",
+    "label": "Create table \"farmLog\"",
+    "summary": "Creates table \"farmLog\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "farmLog"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"farmLog\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"farmLog\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"farmLog\"",
+        "sql": "CREATE TABLE \"public\".\"farmLog\" (\n  \"avgTemp\" float8,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"cropId\" int4 NOT NULL,\n  \"date\" timestamptz NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"memo\" text NOT NULL,\n  \"stage\" text NOT NULL,\n  \"workType\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"farmLog\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"farmLog\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.crop.crop_farmId_idx_786bd89b",
+    "label": "Create index \"crop_farmId_idx_786bd89b\" on \"crop\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "crop_farmId_idx_786bd89b",
+        "table": "crop"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"crop_farmId_idx_786bd89b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"crop_farmId_idx_786bd89b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"crop_farmId_idx_786bd89b\"",
+        "sql": "CREATE INDEX \"crop_farmId_idx_786bd89b\" ON \"public\".\"crop\" (\"farmId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"crop_farmId_idx_786bd89b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"crop_farmId_idx_786bd89b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.farmLog.farmLog_cropId_idx_879e8d63",
+    "label": "Create index \"farmLog_cropId_idx_879e8d63\" on \"farmLog\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "farmLog_cropId_idx_879e8d63",
+        "table": "farmLog"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"farmLog_cropId_idx_879e8d63\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"farmLog_cropId_idx_879e8d63\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"farmLog_cropId_idx_879e8d63\"",
+        "sql": "CREATE INDEX \"farmLog_cropId_idx_879e8d63\" ON \"public\".\"farmLog\" (\"cropId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"farmLog_cropId_idx_879e8d63\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"farmLog_cropId_idx_879e8d63\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.crop.crop_farmId_fkey",
+    "label": "Add foreign key \"crop_farmId_fkey\" on \"crop\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "crop_farmId_fkey",
+        "table": "crop"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"crop_farmId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "crop_farmId_fkey",
+          "public",
+          "\"public\".\"crop\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"crop_farmId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"crop\"\nADD CONSTRAINT \"crop_farmId_fkey\"\nFOREIGN KEY (\"farmId\")\nREFERENCES \"public\".\"farm\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"crop_farmId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "crop_farmId_fkey",
+          "public",
+          "\"public\".\"crop\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.farmLog.farmLog_cropId_fkey",
+    "label": "Add foreign key \"farmLog_cropId_fkey\" on \"farmLog\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "farmLog_cropId_fkey",
+        "table": "farmLog"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"farmLog_cropId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "farmLog_cropId_fkey",
+          "public",
+          "\"public\".\"farmLog\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"farmLog_cropId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"farmLog\"\nADD CONSTRAINT \"farmLog_cropId_fkey\"\nFOREIGN KEY (\"cropId\")\nREFERENCES \"public\".\"crop\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"farmLog_cropId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "farmLog_cropId_fkey",
+          "public",
+          "\"public\".\"farmLog\""
+        ]
+      }
+    ]
+  }
+]
