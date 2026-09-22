@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/src/prisma/db";
+import { db } from "@/prisma/db";
 import { revalidatePath } from "next/cache";
 
 // Prisma 조인 결과를 위한 타입 인터페이스
@@ -55,7 +55,7 @@ export async function getCropsForSelect() {
 // 새 영농일지 DB 저장
 export async function createFarmLog(
   data:
-     FormData
+    | FormData
     | {
         date: string;
         cropId: number | string;
@@ -90,7 +90,7 @@ export async function createFarmLog(
         date: new Date(date),
         workType,
         stage: "생육기",
-        memo:content,
+        memo: content,
       },
     });
 

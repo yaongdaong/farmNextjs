@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/src/prisma/db";
+import { db } from "@/prisma/db";
 
 interface FarmSavePayload {
   location_str: string;
