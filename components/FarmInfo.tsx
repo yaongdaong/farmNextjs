@@ -38,6 +38,8 @@ export interface CropItem {
   area: string;
   plantDate: string;
   bloomDate: string;
+  targetGdd?: number; // 목표 적산온도 (예: 1200)
+  baseTemp?: number; // 발육 생육 기준온도 (예: 10.0)
   analysisResult?: string;
 }
 
@@ -48,6 +50,32 @@ interface FarmInfoProps {
   cropList: CropItem[];
   setCropList: Dispatch<SetStateAction<CropItem[]>>;
 }
+
+// 작물별 표준 매핑 데이터
+export const CROP_GDD_DATABASE: Record<string, { baseTemp: number; targetGdd: number }> = {
+  // 식량 작물
+  벼: { baseTemp: 10.0, targetGdd: 2200 },
+  옥수수: { baseTemp: 10.0, targetGdd: 1400 },
+  감자: { baseTemp: 7.0, targetGdd: 1000 },
+  고구마: { baseTemp: 15.0, targetGdd: 1800 },
+  콩: { baseTemp: 10.0, targetGdd: 1300 },
+
+  // 채소류 (과채류 / 엽채류)
+  토마토: { baseTemp: 10.0, targetGdd: 1200 },
+  고추: { baseTemp: 10.0, targetGdd: 1350 },
+  딸기: { baseTemp: 5.0, targetGdd: 900 },
+  오이: { baseTemp: 12.0, targetGdd: 1100 },
+  상추: { baseTemp: 4.0, targetGdd: 600 },
+  배추: { baseTemp: 5.0, targetGdd: 800 },
+  양파: { baseTemp: 4.0, targetGdd: 1000 },
+  마늘: { baseTemp: 4.0, targetGdd: 1100 },
+
+  // 과수류
+  사과: { baseTemp: 7.0, targetGdd: 1500 },
+  배: { baseTemp: 7.0, targetGdd: 1600 },
+  복숭아: { baseTemp: 8.0, targetGdd: 1400 },
+  포도: { baseTemp: 10.0, targetGdd: 1600 },
+};
 
 export default function FarmInfo({ totalArea, setTotalArea, cropList, setCropList }: FarmInfoProps) {
   // 위치 및 기상 관련 상태
@@ -112,7 +140,23 @@ export default function FarmInfo({ totalArea, setTotalArea, cropList, setCropLis
   };
 
   const handleCropChange = <K extends keyof CropItem>(id: string, field: K, value: CropItem[K]) => {
-    setCropList((prev) => prev.map((crop) => (crop.id === id ? { ...crop, [field]: value } : crop)));
+    setCropList((prev) =>
+      prev.map((crop) => {
+        if (crop.id !== id) return crop;
+
+        // 작물 이름(name)이 변경되었을 때 DB 사전 정보 매핑
+        if (field === "name" && typeof value === "string") {
+          const matched = CROP_GDD_DATABASE[value.trim()];
+          return {
+            ...crop,
+            name: value,
+            baseTemp: matched ? matched.baseTemp : (crop.baseTemp ?? 10.0), // 매칭 실패 시 기존값/기본값 사용
+            targetGdd: matched ? matched.targetGdd : (crop.targetGdd ?? 1200.0),
+          };
+        }
+        return { ...crop, [field]: value };
+      }),
+    );
   };
 
   // 식재 예정 시 빅데이터 기반 작물별 최적 식재 면적 추천 핸들러
@@ -176,6 +220,9 @@ export default function FarmInfo({ totalArea, setTotalArea, cropList, setCropLis
               plant_date: crop.plantDate || new Date().toISOString().split("T")[0],
               // location_str: fullAddress || `${sido} ${sigungu}`,
               location_str: targetLocation,
+              target_gdd: Number(crop.targetGdd) || 1200.0,
+              base_temp: Number(crop.baseTemp) || 10.0,
+              recent_weather: [],
             }),
           });
 
@@ -266,7 +313,6 @@ export default function FarmInfo({ totalArea, setTotalArea, cropList, setCropLis
       setIsSaving(false);
     }
   };
-
 
   return (
     <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-100 font-sans">

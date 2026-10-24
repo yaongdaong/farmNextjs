@@ -32,6 +32,11 @@ export default function AiAnalysisPage() {
     daysLeft: 75,
     expectedYieldKg: 2400,
     expectedRevenue: 36000000,
+    // 💰 SettlementStage에서 요구하는 정산 데이터 추가
+    totalRevenue: 36000000,
+    totalCost: 165000, // 자원 비용 합계
+    netProfit: 35835000,
+    profitMargin: 99.5,
     nextTasks: ["야간 온도 8℃ 이상 유지 관리", "적엽 및 적화 작업 1차 시행", "벌통 입식 준비 (수분 관리)"],
     pestWarnings: [
       {

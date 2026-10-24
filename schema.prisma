@@ -8,45 +8,118 @@ datasource db {
 }
 
 model crop {
-  baseTemp      Float     @default(10)
-  bloomDate     DateTime? @db.Timestamptz(6)
-  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
-  expectedYield Float?
-  farmId        Int
-  harvestDate   DateTime? @db.Timestamptz(6)
-  id            Int       @id @default(autoincrement())
-  name          String
-  plantingDate  DateTime? @db.Timestamptz(6)
-  status        String
-  targetGdd     Float     @default(1500)
-  farm          farm      @relation(fields: [farmId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  farmLog       farmLog[]
+  id             Int             @id @default(autoincrement())
+  farmId         Int
+  name           String
+  status         String
+  baseTemp       Float           @default(10)
+  upperTemp      Float           @default(30)
+  targetGdd      Float           @default(1500)
+  expectedYield  Float?
+  plantingDate   DateTime?       @db.Timestamptz(6)
+  bloomDate      DateTime?       @db.Timestamptz(6)
+  harvestDate    DateTime?       @db.Timestamptz(6)
+  createdAt      DateTime        @default(now()) @db.Timestamptz(6)
+  
+  farm           farm            @relation(fields: [farmId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  stages         crop_stage_gdds[]
+  logs           user_crop_logs[]
+  farmLogs       farmLog[]
 
-  @@index([farmId], map: "crop_farmId_idx_786bd89b")
+  @@index([farmId], map: "crop_farmId_idx")
+}
+
+model crop_stage_gdds {
+  id        Int    @id @default(autoincrement())
+  cropId    Int
+  stageName String
+  targetGdd Float
+
+  crop      crop   @relation(fields: [cropId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([cropId], map: "crop_stage_gdds_cropId_idx")
+}
+
+model user_crop_logs {
+  id                        Int       @id @default(autoincrement())
+  userId                    Int       @default(1)
+  cropId                    Int
+  lastEventType             String    @default("PLANTED")
+  lastEventDate             DateTime  @db.Date
+  accumulatedGddSinceEvent  Float     @default(0.0)
+  estimatedHarvestDate      DateTime? @db.Date
+  updatedAt                 DateTime  @default(now()) @db.Timestamptz(6)
+
+  crop                      crop      @relation(fields: [cropId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([cropId], map: "user_crop_logs_cropId_idx")
 }
 
 model farm {
-  actualArea Float
-  address    String
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
-  gridX      Int
-  gridY      Int
-  id         Int      @id @default(autoincrement())
-  name       String
-  totalArea  Float
-  crop       crop[]
+  id               Int          @id @default(autoincrement())
+  name             String
+  address          String
+  actualArea       Float
+  totalArea        Float
+  gridX            Int
+  gridY            Int
+  plantDate        DateTime?    @db.Date
+  bloomDate        DateTime?    @db.Date
+  statusType       String       @default("PLANNED")
+  growthStatus     String       @default("영농생장기")
+  accumulatedTemp  Float        @default(0.0)
+  targetTemp       Float?
+  baseTemp         Float?
+  targetGdd        Float?
+  facilityType     String?
+  createdAt        DateTime     @default(now()) @db.Timestamptz(6)
+
+  crop             crop[]
+  farmLogs         farmLog[]
+  predictions      predictions[]
+  harvests         harvests[]
 }
 
 model farmLog {
-  avgTemp   Float?
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  cropId    Int
-  date      DateTime @db.Timestamptz(6)
-  id        Int      @id @default(autoincrement())
-  memo      String
-  stage     String
-  workType  String
-  crop      crop     @relation(fields: [cropId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id           Int       @id @default(autoincrement())
+  farmId       Int?
+  cropId       Int?
+  date         DateTime  @db.Timestamptz(6)
+  growthStage String    // 스네이크 케이스로 통일
+  workType     String
+  avgTemp      Float?
+  memo         String
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
 
-  @@index([cropId], map: "farmLog_cropId_idx_879e8d63")
+  farm         farm?     @relation(fields: [farmId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  crop         crop?     @relation(fields: [cropId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([farmId], map: "farmLog_farmId_idx")
+  @@index([cropId], map: "farmLog_cropId_idx")
+}
+
+model predictions {
+  id                     Int       @id @default(autoincrement())
+  farmId                 Int
+  predictedHarvestDate   DateTime? @db.Date
+  predictedYield         Float?
+  predictedGdd           Float?
+  predictionDate         DateTime  @default(now()) @db.Timestamptz(6)
+
+  farm                   farm      @relation(fields: [farmId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([farmId], map: "predictions_farmId_idx")
+}
+
+model harvests {
+  id                  Int       @id @default(autoincrement())
+  farmId              Int
+  actualHarvestDate   DateTime  @db.Date
+  actualYield         Float
+  memo                String?
+  createdAt           DateTime  @default(now()) @db.Timestamptz(6)
+
+  farm                farm      @relation(fields: [farmId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([farmId], map: "harvests_farmId_idx")
 }

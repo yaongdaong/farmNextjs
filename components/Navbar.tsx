@@ -19,12 +19,12 @@ export default function Navbar() {
     },
     {
       name: "영농 일지",
-      href: "/farm-logs",
+      href: "/farmlogrecently",
       icon: BookOpen,
     },
     {
       name: "AI 분석",
-      href: "/ai-analysis",
+      href: "/aiAnalysisFinalFinal",
       icon: Sparkles,
     },
   ];

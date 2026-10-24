@@ -7,7 +7,11 @@ interface FarmSavePayload {
   crop_name: string;
   status_type: "growing" | "planned";
   plant_date?: string;
-
+  bloom_date?: string;
+  target_temp?: number;
+  base_temp?: number;
+  target_gdd?: number;
+  facility_type?: string;
   weather_data: {
     temp: number;
     humidity: number;
@@ -40,21 +44,34 @@ export async function POST(request: Request) {
       );
     }
 
+    // 날짜 유효성 검사 및 변환 함수 (빈 문자열이나 '-' 들어올 경우 null 처리)
+    const parseDate = (dateStr?: string) => {
+      if (!dateStr || dateStr.trim() === "" || dateStr === "-") return null;
+      const parsed = new Date(dateStr);
+      return isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const plantDateObj = parseDate(payload.plant_date);
+    const bloomDateObj = parseDate(payload.bloom_date);
+
     // Prisma 8에서는 $transaction이 아니라 transaction()
     const result = await db.$transaction(async (tx) => {
       // 1. 농장 생성
       const farm = await tx.farm.create({
         data: {
-          name: `${payload.crop_name} 농장`,
+          name: payload.crop_name ,
           address: payload.location_str,
-
           // 현재는 실제 기상청 격자값이 없으므로 임시값
           gridX: 0,
           gridY: 0,
-
           totalArea: payload.area_pyeong,
-
           actualArea: payload.status_type === "growing" ? payload.area_pyeong : 0,
+          plantDate: plantDateObj,
+          bloomDate: bloomDateObj,
+          targetTemp: payload.target_temp ?? null,
+          baseTemp: payload.base_temp ?? null,
+          targetGdd: payload.target_gdd ?? null,
+          facilityType: payload.facility_type ?? null,
         },
       });
 
@@ -65,10 +82,10 @@ export async function POST(request: Request) {
           name: payload.crop_name,
           status: payload.status_type,
 
-          plantingDate: payload.plant_date ? new Date(payload.plant_date) : null,
+          plantingDate: plantDateObj,
 
-          baseTemp: 10.0,
-          targetGdd: 1500.0,
+          baseTemp: payload.base_temp ?? 10.0,
+          targetGdd: payload.target_gdd ?? 1500.0,
         },
       });
 
@@ -82,7 +99,7 @@ export async function POST(request: Request) {
           cropId: crop.id,
           date: new Date(),
           workType: "기상자동기록",
-          stage: "등록",
+          growthStage: "등록",
           memo: "농장 등록 시 자동 저장된 기상 데이터",
 
           avgTemp: payload.weather_data.temp,

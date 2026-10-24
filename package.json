@@ -13,6 +13,7 @@
     "contract:emit": "prisma contract emit"
   },
   "dependencies": {
+    "@google/genai": "^2.30.0",
     "@prisma/orm-postgres": "^8.0.0-rc.8",
     "dotenv": "^17.4.2",
     "lucide-react": "^1.38.0",
